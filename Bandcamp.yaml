@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "3"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"bandcampapi","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"bandcampapi"}},"template":{"metadata":{"labels":{"app":"bandcampapi"}},"spec":{"containers":[{"image":"muzika/bandcampapi:1.0","name":"node-app","ports":[{"containerPort":8080}]}]}}}}
+  creationTimestamp: "2025-11-06T11:28:30Z"
+  generation: 6
+  name: bandcampapi
+  namespace: default
+  resourceVersion: "26964"
+  uid: e9045e04-fa77-4dc5-9bd5-cccfeaff5669
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: bandcampapi
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: bandcampapi
+    spec:
+      containers:
+      - image: muzika/bandcampapi:1.0
+        imagePullPolicy: IfNotPresent
+        name: node-app1
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2025-11-06T11:51:30Z"
+    lastUpdateTime: "2025-11-06T12:05:04Z"
+    message: ReplicaSet "bandcampapi-5cdd56777d" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2025-11-06T12:12:08Z"
+    lastUpdateTime: "2025-11-06T12:12:08Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 6
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
