@@ -5,14 +5,9 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'BandcampApi/**'
-      - '.github/workflows/bandcampapi-deploy.yaml'
   pull_request:
     branches:
       - main
-    paths:
-      - 'BandcampApi/**'
   workflow_dispatch:
     inputs:
       environment:
@@ -59,7 +54,6 @@ jobs:
 
       - name: Generate version
         id: version
-        working-directory: BandcampApi
         run: |
           VERSION=$(grep -o '<version>[^<]*</version>' pom.xml | sed 's/<version>\(.*\)<\/version>/\1/' | sed -n '2p' | tr -d '[:space:]' || echo "0.0.1")
           SHORT_SHA=$(git rev-parse --short HEAD)
@@ -68,12 +62,10 @@ jobs:
           echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
 
       - name: Build BandcampApi
-        working-directory: BandcampApi
         run: mvn clean package -DskipTests -B
 
       - name: Run Tests
         if: ${{ github.event.inputs.skip_tests != 'true' }}
-        working-directory: BandcampApi
         run: mvn test -B
 
       - name: Upload test results
@@ -81,7 +73,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: BandcampApi/target/surefire-reports/
+          path: target/surefire-reports/
           retention-days: 7
           if-no-files-found: ignore
 
@@ -118,7 +110,6 @@ jobs:
       - name: Build and Push Docker image
         env:
           ACR_NAME: ${{ secrets.ACR_NAME }}
-        working-directory: BandcampApi
         run: |
           mvn compile jib:build \
             -Djib.to.image=${{ secrets.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ needs.build.outputs.image_tag }} \
@@ -216,7 +207,7 @@ jobs:
           kubectl get pods -n kafka -l strimzi.io/cluster=kafka-cluster || echo "No Kafka pods found"
 
       - name: Update manifests
-        working-directory: BandcampApi/k8s
+        working-directory: k8s
         run: |
           sed -i "s/newTag: .*/newTag: ${{ needs.build.outputs.image_tag }}/" kustomization.yaml
           sed -i "s/\${ACR_NAME}/${{ secrets.ACR_NAME }}/g" deployment.yaml kustomization.yaml
@@ -240,7 +231,7 @@ jobs:
           fi
 
       - name: Setup Key Vault secrets (SecretProviderClass)
-        working-directory: BandcampApi/k8s
+        working-directory: k8s
         run: |
           [ -f "secretproviderclass.yaml" ] || { echo "No SecretProviderClass found, skipping Key Vault setup"; exit 0; }
           
@@ -282,7 +273,7 @@ jobs:
           exit 1
 
       - name: Deploy BandcampApi
-        working-directory: BandcampApi/k8s
+        working-directory: k8s
         run: |
           
           # Exclude secrets.yaml if using Key Vault
