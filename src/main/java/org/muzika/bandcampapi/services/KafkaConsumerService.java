@@ -2,7 +2,7 @@ package org.muzika.bandcampapi.services;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.muzika.DiscoverResponse;
+import org.muzika.bandcampapi.lib.DiscoverResponse;
 import org.muzika.bandcampapi.kafkaMassages.RequestRandomSong;
 import org.muzika.bandcampapi.kafkaMassages.RequestSlskdSong;
 import org.muzika.bandcampapi.searcher.BandcampSearcher;

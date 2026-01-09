@@ -4,8 +4,8 @@ package org.muzika.bandcampapi.kafkaMassages;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.muzika.DiscoverResponse;
-import org.muzika.Result;
+import org.muzika.bandcampapi.lib.DiscoverResponse;
+import org.muzika.bandcampapi.lib.Result;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;

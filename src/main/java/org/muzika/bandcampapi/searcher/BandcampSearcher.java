@@ -2,8 +2,8 @@ package org.muzika.bandcampapi.searcher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.nodes.Document;
-import org.muzika.DiscoverResponse;
-import org.muzika.WebSearcher;
+import org.muzika.bandcampapi.lib.DiscoverResponse;
+import org.muzika.bandcampapi.lib.WebSearcher;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
