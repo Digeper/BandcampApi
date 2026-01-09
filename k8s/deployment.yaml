@@ -1,0 +1,107 @@
+# Deployment for BandcampApi service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bandcampapi
+  namespace: muzika
+  labels:
+    app: bandcampapi
+    app.kubernetes.io/name: bandcampapi
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: muzika-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bandcampapi
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: bandcampapi
+        app.kubernetes.io/name: bandcampapi
+        app.kubernetes.io/component: backend
+        app.kubernetes.io/part-of: muzika-platform
+    spec:
+      serviceAccountName: bandcampapi-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: bandcampapi
+          image: ${ACR_NAME}.azurecr.io/muzika/bandcampapi:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: bandcampapi-config
+            - secretRef:
+                name: bandcampapi-secrets
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          startupProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: secrets-store
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: bandcampapi-azure-keyvault
+
+---
+# ServiceAccount for BandcampApi
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bandcampapi-sa
+  namespace: muzika
+  labels:
+    app: bandcampapi
+    app.kubernetes.io/name: bandcampapi
+    app.kubernetes.io/part-of: muzika-platform

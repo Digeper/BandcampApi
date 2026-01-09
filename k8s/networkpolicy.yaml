@@ -1,0 +1,51 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bandcampapi-network-policy-restrictive
+  namespace: muzika
+spec:
+  podSelector:
+    matchLabels:
+      app: bandcampapi
+  policyTypes:
+     - Ingress
+     - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: muzika
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Kafka - Allow egress to Kafka namespace
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kafka
+      ports:
+        - protocol: TCP
+          port: 9092
+    # PostgreSQL - Specific IP for Azure PostgreSQL
+    - to:
+        - ipBlock:
+            cidr: 72.146.21.239/32
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Azure services (Key Vault, ACR, etc.)
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443

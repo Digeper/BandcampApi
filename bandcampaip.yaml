@@ -1,3 +1,11 @@
+# DEPRECATED: This file is for localhost deployment only
+# For Azure AKS deployment, use: BandcampApi/k8s/service.yaml
+# This file is kept for reference only and should not be used for production deployments
+#
+# DEPRECATED: This file is for localhost deployment only
+# For Azure AKS deployment, use BandcampApi/k8s/ directory instead
+# This file is kept for reference only and should not be used for production
+---
 apiVersion: v1
 kind: Service
 metadata:
