@@ -102,9 +102,9 @@ public abstract class WebSearcher {
                     .header("Sec-Fetch-Site","same-origin")
                     .timeout(30000)
                     .execute().parse();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }
         return dc;
     }
 
@@ -139,4 +139,3 @@ public abstract class WebSearcher {
 
     }
 }
-

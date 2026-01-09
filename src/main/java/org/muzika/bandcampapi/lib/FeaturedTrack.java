@@ -9,4 +9,3 @@ public class FeaturedTrack{
     public String stream_url;
     public FeaturedTrack() {}
 }
-

@@ -1,5 +1,12 @@
 package org.muzika.bandcampapi.lib;
 
+class Price{
+    public int amount;
+    public String currency;
+    public boolean is_money;
+    public Price() {}
+}
+
 class BandImage{
     public long image_id;
     public boolean is_art;
@@ -39,4 +46,3 @@ public class Result{
     public Object is_following_band;
 
 }
-
