@@ -28,7 +28,7 @@ public class KafkaConsumerService {
 
 
 
-    @KafkaListener(topics = {"request-random-song"} , groupId = "group-id",containerFactory = "songConcurrentKafkaListenerContainerFactory")
+    @KafkaListener(topics = {"request-random-song"}, containerFactory = "songConcurrentKafkaListenerContainerFactory")
     public void consumeRequestSong(RequestRandomSong loadedSong) {
         log.info("Received request song: {}", loadedSong);
 
