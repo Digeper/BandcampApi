@@ -50,27 +50,30 @@ spec:
               value: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
           resources:
             requests:
-              memory: "512Mi"
-              cpu: "100m"
+              memory: "256Mi"
+              cpu: "50m"
             limits:
-              memory: "1Gi"
-              cpu: "1000m"
+              memory: "512Mi"
+              cpu: "500m"
           livenessProbe:
-            tcpSocket:
+            httpGet:
+              path: /health
               port: 8080
             initialDelaySeconds: 60
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
           readinessProbe:
-            tcpSocket:
+            httpGet:
+              path: /health
               port: 8080
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
           startupProbe:
-            tcpSocket:
+            httpGet:
+              path: /health
               port: 8080
             initialDelaySeconds: 10
             periodSeconds: 5

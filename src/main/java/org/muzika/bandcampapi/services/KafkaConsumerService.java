@@ -19,6 +19,7 @@ public class KafkaConsumerService {
     private final BandcampSearcher searcher;
     private final KafkaProducerService kafka;
 
+
     public KafkaConsumerService(KafkaProducerService kafka, BandcampSearcher searcher) {
         this.kafka = kafka;
         this.searcher = searcher;
