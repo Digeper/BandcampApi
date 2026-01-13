@@ -19,8 +19,12 @@
     </licenses>
     <properties>
         <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <spring-cloud.version>2025.0.0</spring-cloud.version>
         <jib-maven-plugin.version>3.4.6</jib-maven-plugin.version>
+        <!-- Skip Docker build by default - set skip.docker.build=false to enable -->
+        <skip.docker.build>true</skip.docker.build>
         <!-- ACR_NAME should be replaced with your Azure Container Registry name -->
         <docker.image.registry>${env.ACR_NAME}.azurecr.io</docker.image.registry>
         <docker.image.name>muzika/bandcampapi</docker.image.name>
@@ -89,6 +93,11 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.6.0</version>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -113,6 +122,10 @@
                             <groupId>org.springframework.boot</groupId>
                             <artifactId>spring-boot-devtools</artifactId>
                         </exclude>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -121,6 +134,7 @@
                 <artifactId>jib-maven-plugin</artifactId>
                 <version>${jib-maven-plugin.version}</version>
                 <configuration>
+                    <skip>${skip.docker.build}</skip>
                     <from>
                         <image>eclipse-temurin:17-jre</image>
                     </from>
@@ -147,24 +161,46 @@
                         </jvmFlags>
                     </container>
                 </configuration>
-                <executions>
-                    <!-- Build Docker image automatically during package phase -->
-                    <execution>
-                        <id>docker-build</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>dockerBuild</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <!-- Docker build is disabled by default. To build Docker image:
+                     1. Set environment variable: export ACR_NAME=your-registry-name
+                     2. Run: mvn jib:dockerBuild
+                     Or set skip.docker.build=false to enable automatic build during package phase -->
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>21</source>
-                    <target>21</target>
+                    <source>17</source>
+                    <target>17</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.42</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <!-- SpringDoc OpenAPI Maven Plugin for generating openapi.yaml -->
+            <plugin>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-maven-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>generate-api-docs</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <apiDocsUrl>http://localhost:${server.port}/api-docs</apiDocsUrl>
+                            <outputFileName>openapi.yaml</outputFileName>
+                            <outputDir>${project.basedir}</outputDir>
+                            <skip>true</skip>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
 
