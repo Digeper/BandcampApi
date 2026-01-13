@@ -1,12 +1,27 @@
-FROM openjdk:17-jre-slim
+# Multi-stage build for BandcampApi
+# Stage 1: Build the Spring Boot application
+FROM maven:3.9-eclipse-temurin-17 AS builder
 
-# Set working directory
+WORKDIR /build
+
+# Copy pom.xml first for better layer caching
+COPY pom.xml .
+
+# Copy source code
+COPY src ./src
+
+# Build the application (skip tests for faster builds)
+RUN mvn clean package -DskipTests
+
+# Stage 2: Run the application
+FROM eclipse-temurin:17-jre
+
 WORKDIR /app
 
-# Copy the Spring Boot JAR file
-COPY target/your-spring-boot-app.jar app.jar
+# Copy the built JAR file from builder stage
+COPY --from=builder /build/target/BandcampApi-0.0.1.jar app.jar
 
-# Expose the port your app runs on (typically 8080)
+# Expose the port
 EXPOSE 8080
 
 # Run the application
